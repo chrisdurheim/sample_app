@@ -39,18 +39,13 @@ describe "UserPages" do
 				it { should have_content('* Name can\'t be blank') }
 				it { should have_content('* Email can\'t be blank') }
 				it { should have_content('* Email is invalid') }
-				it { should have_content('* Password is too short (minimum is 6 characters)') }
+				it { should have_content('* Password is too short') }
 				it { should have_content('* Password confirmation can\'t be blank') }
 			end
 		end
 		
 		describe "with too long name" do
-			before do
-				fill_in "Name", 		with: 'a'*51
-				fill_in "Email",		with: "user@example.com"
-				fill_in "Password",		with: "foobar"
-				fill_in "Confirmation",	with: "foobar"
-			end
+			before { fill_signup_name_too_long }
 		
 			it "should not create a user" do
 				expect { click_button submit }.not_to change(User, :count)
@@ -58,28 +53,21 @@ describe "UserPages" do
 			
 			describe "error messages" do
 				before { click_button submit }
-				
 				it { should have_selector('title', text: 'Sign up') }
 				it { should have_content('The form contains 1 error.') }
-				it { should have_content('* Name is too long (maximum is 50 characters)') }
+				it { should have_content('* Name is too long') }
 			end
 		end
 		
 		describe "with non-matching password" do
-			before do
-				fill_in "Name", 		with: "Example User"
-				fill_in "Email",		with: "user@example.com"
-				fill_in "Password",		with: "foobar"
-				fill_in "Confirmation",	with: "foobarz"
-			end
-		
+			before { fill_signup_password_mismatch }
+			
 			it "should not create a user" do
 				expect { click_button submit }.not_to change(User, :count)
 			end
 			
 			describe "error messages" do
 				before { click_button submit }
-				
 				it { should have_selector('title', text: 'Sign up') }
 				it { should have_content('The form contains 1 error.') }
 				it { should have_content('* Password doesn\'t match confirmation') }
@@ -89,19 +77,10 @@ describe "UserPages" do
 		describe "with non-unique email" do	
 
 			before do
-				fill_in "Name", 		with: "Example User"
-				fill_in "Email",		with: "user@example.com"
-				fill_in "Password",		with: "foobar"
-				fill_in "Confirmation",	with: "foobar"
-				
+				fill_signup_valid_info
 				click_button submit
-				
 				visit signup_path
-				
-				fill_in "Name", 		with: "Example User"
-				fill_in "Email",		with: "user@example.com"
-				fill_in "Password",		with: "foobar"
-				fill_in "Confirmation",	with: "foobar"
+				fill_signup_valid_info
 			end
 		
 			it "should not create a user" do
@@ -119,13 +98,8 @@ describe "UserPages" do
 		
 		
 		describe "with valid information" do
-			before do
-				fill_in "Name", 		with: "Example User"
-				fill_in "Email",		with: "user@example.com"
-				fill_in "Password",		with: "foobar"
-				fill_in "Confirmation",	with: "foobar"
-			end
-			
+			before { fill_signup_valid_info }
+						
 			it "should create a user" do
 				expect { click_button submit }.to change(User, :count).by(1)
 			end
