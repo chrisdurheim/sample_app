@@ -14,6 +14,11 @@ describe "Authentication" do
 			
 			it { should have_selector('title', text: 'Sign in') } 
 			it { should have_error_message('Invalid') }
+			it { should_not have_link('Users',			href: users_path) }
+			it { should_not have_link('Profile') }
+			it { should_not have_link('Settings') }
+			it { should_not have_link('Sign out', 		href: signout_path) }
+			it { should have_link('Sign in', 			href: signin_path) }
 			
 			describe "after visiting another page" do
 				before { click_link "Home" }
@@ -42,6 +47,18 @@ describe "Authentication" do
 	
 	describe "authorization" do
 
+		describe "for signed-in users" do
+			let(:user) { FactoryGirl.create(:user) }
+			
+			describe "when attempting to visit the new page" do
+				before do
+					sign_in(user)
+					visit new_user_path
+				end
+				it { should have_selector('title', text: full_title('')) }
+			end
+		end
+	
 		describe "for non-signed-in users" do
 			let(:user) { FactoryGirl.create(:user) }
 
@@ -61,11 +78,7 @@ describe "Authentication" do
 
 					describe "when signing in again" do
 						before do
-						delete signout_path
-						visit signin_path
-						fill_in "Email",    with: user.email
-						fill_in "Password", with: user.password
-						click_button "Sign in"
+							sign_in(user)
 						end
 
 						it "should render the default (profile) page" do

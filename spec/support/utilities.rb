@@ -28,7 +28,7 @@ def fill_signup_valid_info
 	fill_in "Name", 		with: "Example User"
 	fill_in "Email",		with: "user@example.com"
 	fill_in "Password",		with: "foobar"
-	fill_in "Confirmation",	with: "foobar"	
+	fill_in "Confirm Password",	with: "foobar"	
 end
 
 def fill_signup_name_too_long
@@ -38,5 +38,5 @@ end
 
 def	fill_signup_password_mismatch
 	fill_signup_valid_info
-	fill_in "Confirmation", with: "foobarz"
+	fill_in "Confirm Password", with: "foobarz"
 end
