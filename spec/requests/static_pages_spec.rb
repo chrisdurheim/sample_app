@@ -19,16 +19,39 @@ describe "StaticPages" do
 		
 		describe "for signed-in users" do
 			let(:user) { FactoryGirl.create(:user) }
+			
 			before do
 				FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
-				FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
 				sign_in user
 				visit root_path
 			end
 			
-			it "should render the user's feed" do
-				user.feed.each do |item|
-					page.should have_selector("li##{item.id}", text: item.content)
+			describe "single micropost display" do
+				describe "should display the correct number of posts and pluralize" do
+					it { should have_content('1 micropost') }
+				end
+			end
+									
+			describe "multiple micropost display" do
+				before do
+					30.times { FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet") }
+					sign_in user
+					visit root_path
+				end
+				
+				it "should render the user's feed" do
+					user.feed[0..2].each do |item|
+						page.should have_selector("li##{item.id}", text: item.content)
+					end
+				end
+				
+				describe "should display the correct number of posts and pluralize" do
+					it { should have_content("31 microposts") }
+				end
+				
+				describe "pagination" do
+					it { should have_link('Next') }
+					its(:html) { should match('>2</a>') }
 				end
 			end
 		end

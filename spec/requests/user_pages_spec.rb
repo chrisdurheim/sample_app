@@ -25,6 +25,28 @@ describe "UserPages" do
 			it { should have_content(m1.content) }
 			it { should have_content(m2.content) }
 			it { should have_content(user.microposts.count) }
+			
+			describe "delete links" do
+				let(:admin) { FactoryGirl.create(:admin) }
+				
+				describe "as another user" do
+					before do 
+						sign_in admin
+						visit user_path(user)
+					end				
+					
+					it { should_not have_link('delete') }
+				end
+				
+				describe "as user" do
+					before do 
+						sign_in user
+						visit user_path(user)
+					end	
+				
+					it { should have_link('delete') }
+				end
+			end
 		end
 	end
 	
